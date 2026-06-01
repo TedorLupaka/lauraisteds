@@ -108,8 +108,56 @@ export default function CameraRig() {
       zoomVelocityRef.current.addScaledVector(dir, -amount);
     };
 
+    let initialPinchDistance = 0;
+
+    const getPinchDistance = (touches: TouchList) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.hypot(dx, dy);
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        initialPinchDistance = getPinchDistance(e.touches);
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const currentDistance = getPinchDistance(e.touches);
+        const delta = initialPinchDistance - currentDistance;
+        initialPinchDistance = currentDistance;
+
+        if (!controlsRef.current) return;
+
+        // Get center point of pinch
+        const rect = domElement.getBoundingClientRect();
+        const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        const x = ((centerX - rect.left) / rect.width) * 2 - 1;
+        const y = -((centerY - rect.top) / rect.height) * 2 + 1;
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+
+        const speed = 0.3; // Touch zoom speed
+        const amount = delta * speed;
+
+        const dir = raycaster.ray.direction;
+        zoomVelocityRef.current.addScaledVector(dir, -amount);
+      }
+    };
+
     domElement.addEventListener('wheel', handleWheel, { passive: false });
-    return () => domElement.removeEventListener('wheel', handleWheel);
+    domElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+    domElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      domElement.removeEventListener('wheel', handleWheel);
+      domElement.removeEventListener('touchstart', handleTouchStart);
+      domElement.removeEventListener('touchmove', handleTouchMove);
+    };
   }, [camera, gl, activeMemoryId, focusTarget]);
 
   return (
