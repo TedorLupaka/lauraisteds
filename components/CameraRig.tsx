@@ -141,7 +141,7 @@ export default function CameraRig() {
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
 
-        const speed = 0.3; // Touch zoom speed
+        const speed = 0.01; // Significantly reduced touch zoom speed (touchmove fires constantly)
         const amount = delta * speed;
 
         const dir = raycaster.ray.direction;
