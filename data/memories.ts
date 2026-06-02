@@ -71,6 +71,8 @@ const manualMemories: Memory[] = [
   }
 ];
 
+import { reasonsList } from './reasons';
+
 function seededRandom(seed: number) {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
@@ -95,9 +97,9 @@ const clusterMemories: Memory[] = Array.from({ length: 200 }).map((_, i) => {
 
   return {
     id: `cluster_memory_${i}`,
-    title: `Memory Star ${i + 1}`,
-    date: 'Always and Forever',
-    description: 'A beautiful memory glowing in our cluster.',
+    title: `Reason #${i + 1}`,
+    date: '200 Things I Love About You',
+    description: reasonsList[i] || 'I love you.',
     position: [x, y, z] as [number, number, number],
     constellationId: 'the_cluster'
   };

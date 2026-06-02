@@ -21,11 +21,15 @@ interface MemoryState {
   activeMemoryId: string | null;
   focusTarget: [number, number, number] | null;
   hasSeenFinalSequence: boolean;
+  zoomSpeedMultiplier: number;
+  autoRotateEnabled: boolean;
   
   discoverMemory: (id: string) => void;
   setActiveMemory: (id: string | null) => void;
   setFocusTarget: (target: [number, number, number] | null) => void;
   setHasSeenFinalSequence: (seen: boolean) => void;
+  setZoomSpeedMultiplier: (speed: number) => void;
+  toggleAutoRotate: () => void;
   isMemoryDiscovered: (id: string) => boolean;
   isConstellationComplete: (constellationId: string, allMemories: Memory[]) => boolean;
 }
@@ -35,6 +39,8 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
   activeMemoryId: null,
   focusTarget: null,
   hasSeenFinalSequence: false,
+  zoomSpeedMultiplier: 1.0,
+  autoRotateEnabled: true,
 
   discoverMemory: (id) => set((state) => ({
     discoveredMemories: state.discoveredMemories.includes(id) 
@@ -47,6 +53,10 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
   setFocusTarget: (target) => set({ focusTarget: target }),
 
   setHasSeenFinalSequence: (seen) => set({ hasSeenFinalSequence: seen }),
+
+  setZoomSpeedMultiplier: (speed) => set({ zoomSpeedMultiplier: speed }),
+
+  toggleAutoRotate: () => set((state) => ({ autoRotateEnabled: !state.autoRotateEnabled })),
 
   isMemoryDiscovered: (id) => get().discoveredMemories.includes(id),
 

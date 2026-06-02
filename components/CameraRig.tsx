@@ -13,20 +13,36 @@ export default function CameraRig() {
   const { camera, gl } = useThree();
   const focusTarget = useMemoryStore(state => state.focusTarget);
   const activeMemoryId = useMemoryStore(state => state.activeMemoryId);
+  const zoomSpeedMultiplier = useMemoryStore(state => state.zoomSpeedMultiplier);
+  const autoRotateEnabled = useMemoryStore(state => state.autoRotateEnabled);
   const controlsRef = useRef<OrbitControlsImpl>(null);
 
   const zoomVelocityRef = useRef(new THREE.Vector3());
+  const forwardDir = useRef(new THREE.Vector3());
 
   useFrame((state, delta) => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+
+    const isFocused = !!(activeMemoryId || focusTarget);
+
     if (zoomVelocityRef.current.lengthSq() > 0.0001) {
       camera.position.add(zoomVelocityRef.current);
-      if (controlsRef.current) {
-        controlsRef.current.target.add(zoomVelocityRef.current);
-        controlsRef.current.update();
-      }
+      controls.target.add(zoomVelocityRef.current);
+      controls.update();
       // Apply friction for smooth momentum deceleration
       const friction = Math.exp(-6 * delta);
       zoomVelocityRef.current.multiplyScalar(friction);
+    }
+
+    // In free-roam mode, keep the orbit target directly in front of
+    // the camera so that rotating pivots around the camera's own position.
+    if (!isFocused) {
+      camera.getWorldDirection(forwardDir.current);
+      controls.target.copy(
+        camera.position.clone().addScaledVector(forwardDir.current, 1)
+      );
+      controls.update();
     }
   });
 
@@ -99,7 +115,7 @@ export default function CameraRig() {
 
       // Calculate zoom amount
       const delta = Math.max(-100, Math.min(100, e.deltaY));
-      const speed = 0.8; // Significantly increased speed for faster zooming
+      const speed = 0.4 * zoomSpeedMultiplier; // Base speed multiplied by user control
       const amount = delta * speed;
 
       const dir = raycaster.ray.direction;
@@ -141,7 +157,7 @@ export default function CameraRig() {
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
 
-        const speed = 0.01; // Significantly reduced touch zoom speed (touchmove fires constantly)
+        const speed = 0.01 * zoomSpeedMultiplier; // Base touch speed multiplied by user control
         const amount = delta * speed;
 
         const dir = raycaster.ray.direction;
@@ -158,7 +174,7 @@ export default function CameraRig() {
       domElement.removeEventListener('touchstart', handleTouchStart);
       domElement.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [camera, gl, activeMemoryId, focusTarget]);
+  }, [camera, gl, activeMemoryId, focusTarget, zoomSpeedMultiplier]);
 
   return (
     <OrbitControls
@@ -170,11 +186,11 @@ export default function CameraRig() {
       enablePan={true}
       panSpeed={0.8}
       enableZoom={!!(activeMemoryId || focusTarget)}
-      zoomSpeed={0.4}
+      zoomSpeed={0.1 * zoomSpeedMultiplier}
       enableRotate={true}
       rotateSpeed={0.6}
       maxPolarAngle={Math.PI}
-      autoRotate
+      autoRotate={autoRotateEnabled}
       autoRotateSpeed={0.3}
     />
   );
