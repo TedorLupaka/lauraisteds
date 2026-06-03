@@ -10,7 +10,7 @@ function NebulaDust() {
   const pointsRef = useRef<THREE.Points>(null);
 
   const [positions, colors] = useMemo(() => {
-    const count = 3000;
+    const count = 1500; // Reduced for performance
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
 
@@ -158,7 +158,7 @@ export default function Universe() {
       <Stars 
         radius={120} 
         depth={60} 
-        count={6000} 
+        count={3000} // Reduced for performance
         factor={3} 
         saturation={0} 
         fade 

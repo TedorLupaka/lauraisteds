@@ -63,14 +63,14 @@ export default function OverlayUI() {
               transition={{ duration: 1, delay: 0.2 }}
               className="flex gap-4 pointer-events-auto"
             >
-              <button 
+              <button
                 className="text-white/80 hover:text-white transition-colors p-2 bg-white/5 hover:bg-white/10 rounded-full backdrop-blur-md cursor-pointer"
                 aria-label="Create Memory"
                 onClick={() => setIsCreateModalOpen(true)}
               >
                 <Plus size={24} />
               </button>
-              <button 
+              <button
                 className="text-white/80 hover:text-white transition-colors p-2 bg-white/5 hover:bg-white/10 rounded-full backdrop-blur-md cursor-pointer"
                 aria-label="Menu"
                 onClick={() => setIsSidebarOpen(true)}
@@ -145,7 +145,7 @@ export default function OverlayUI() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 1 }}
-              className="text-right"
+              className="text-right mb-8 sm:mb-0 sm:mr-16 mr-0 "
             >
               <div className="text-white/60 text-sm font-mono tracking-widest mb-2">
                 {discoveredCount} / {totalMemories} DISCOVERED
@@ -156,7 +156,7 @@ export default function OverlayUI() {
                 <motion.div
                   className="absolute top-0 left-0 h-full bg-white/80 shadow-[0_0_10px_rgba(255,255,255,0.8)]"
                   initial={{ width: 0 }}
-                  animate={{ width: `${(discoveredCount / totalMemories) * 100}%` }}
+                  animate={{ width: `${totalMemories === 0 ? 0 : (discoveredCount / totalMemories) * 100}%` }}
                   transition={{ duration: 1, ease: "easeInOut" }}
                 />
               </div>

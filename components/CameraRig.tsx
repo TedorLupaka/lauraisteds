@@ -8,6 +8,10 @@ import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useMemoryStore } from '../hooks/useMemoryStore';
 
+// Hoisted singletons — avoids per-event GC allocations
+const _raycaster = new THREE.Raycaster();
+const _pointer = new THREE.Vector2();
+
 
 export default function CameraRig() {
   const { camera, gl } = useThree();
@@ -107,19 +111,20 @@ export default function CameraRig() {
 
       // Get mouse NDC coordinates
       const rect = domElement.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      _pointer.set(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
+      );
 
       // Create a ray from the camera through the mouse pointer
-      const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+      _raycaster.setFromCamera(_pointer, camera);
 
       // Calculate zoom amount
       const delta = Math.max(-100, Math.min(100, e.deltaY));
       const speed = 0.4 * zoomSpeedMultiplier; // Base speed multiplied by user control
       const amount = delta * speed;
 
-      const dir = raycaster.ray.direction;
+      const dir = _raycaster.ray.direction;
 
       // Add to velocity for momentum effect instead of direct position change
       zoomVelocityRef.current.addScaledVector(dir, -amount);
@@ -152,16 +157,17 @@ export default function CameraRig() {
         const rect = domElement.getBoundingClientRect();
         const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
         const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-        const x = ((centerX - rect.left) / rect.width) * 2 - 1;
-        const y = -((centerY - rect.top) / rect.height) * 2 + 1;
+        _pointer.set(
+          ((centerX - rect.left) / rect.width) * 2 - 1,
+          -((centerY - rect.top) / rect.height) * 2 + 1
+        );
 
-        const raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+        _raycaster.setFromCamera(_pointer, camera);
 
         const speed = 0.01 * zoomSpeedMultiplier; // Base touch speed multiplied by user control
         const amount = delta * speed;
 
-        const dir = raycaster.ray.direction;
+        const dir = _raycaster.ray.direction;
         zoomVelocityRef.current.addScaledVector(dir, -amount);
       }
     };

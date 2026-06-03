@@ -28,9 +28,8 @@ export default function MemoryPanel() {
           {/* Glassmorphism Panel */}
           <div className="relative overflow-hidden rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]">
             
-            {/* Ambient glow behind the panel */}
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
+            {/* Ambient glow — gradient instead of blur for mobile performance */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 rounded-2xl pointer-events-none" />
 
             {/* Image — full-bleed at the top if present */}
             {activeMemory.image && (

@@ -124,11 +124,10 @@ export default function IntroScreen() {
           {/* Soft dark vignette behind text only */}
           <div style={{
             position: 'absolute',
-            width: '560px',
-            height: '260px',
+            width: 'min(90vw, 560px)',
+            height: 'min(50vh, 260px)',
             borderRadius: '50%',
-            background: 'radial-gradient(ellipse at center, rgba(2,2,14,0.70) 0%, transparent 75%)',
-            filter: 'blur(18px)',
+            background: 'radial-gradient(ellipse at center, rgba(2,2,14,0.85) 0%, rgba(2,2,14,0.4) 40%, transparent 70%)',
             pointerEvents: 'none',
           }} />
 
@@ -186,18 +185,18 @@ export default function IntroScreen() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                style={{ textAlign: 'center', padding: '0 32px' }}
+                style={{ textAlign: 'center', padding: '0 5vw', width: '100%', boxSizing: 'border-box' }}
               >
                 <p style={{
                   fontFamily: FONT,
-                  fontSize: '2.4rem',
+                  fontSize: 'clamp(1.5rem, 6vw, 2.4rem)',
                   fontWeight: 600,
                   color: 'rgba(255,255,255,0.95)',
                   letterSpacing: '0.03em',
-                  lineHeight: 1.6,
-                  textShadow: '0 0 24px rgba(0,0,0,0.9), 0 0 48px rgba(180,140,255,0.5)',
+                  lineHeight: 1.4,
+                  textShadow: '0 2px 10px rgba(0,0,0,0.8), 0 0 20px rgba(180,140,255,0.4)',
                   margin: 0,
-                  minHeight: '3rem',
+                  minHeight: '4.5rem',
                 }}>
                   {displayed}
                   {showCursor && (
@@ -218,7 +217,7 @@ export default function IntroScreen() {
             onClick={handleSkip}
             style={{
               position: 'absolute',
-              bottom: '40px',
+              bottom: '15vh',
               fontFamily: FONT,
               fontSize: '0.8rem',
               letterSpacing: '0.3em',

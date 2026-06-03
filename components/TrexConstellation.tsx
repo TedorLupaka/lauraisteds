@@ -156,13 +156,13 @@ function TrexStar({ position }: { position: [number, number, number] }) {
 
       {/* Bright core */}
       <mesh>
-        <sphereGeometry args={[0.1, 24, 24]} />
+        <sphereGeometry args={[0.1, 8, 8]} />
         <meshBasicMaterial color="#ffffff" toneMapped={false} />
       </mesh>
       
       {/* Soft color halo */}
       <mesh ref={haloRef}>
-        <sphereGeometry args={[0.22, 24, 24]} />
+        <sphereGeometry args={[0.22, 8, 8]} />
         <meshBasicMaterial 
           color={starColor} 
           transparent 
