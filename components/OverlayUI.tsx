@@ -1,11 +1,16 @@
 "use client";
 
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, Plus } from 'lucide-react';
 import { useMemoryStore } from '../hooks/useMemoryStore';
-import { memories } from '../data/memories';
+
+import CreateMemoryModal from './CreateMemoryModal';
+import MemorySidebar from './MemorySidebar';
 
 export default function OverlayUI() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const discoveredMemories = useMemoryStore(state => state.discoveredMemories);
   const activeMemoryId = useMemoryStore(state => state.activeMemoryId);
   const hasSeenFinalSequence = useMemoryStore(state => state.hasSeenFinalSequence);
@@ -13,10 +18,10 @@ export default function OverlayUI() {
   const setZoomSpeedMultiplier = useMemoryStore(state => state.setZoomSpeedMultiplier);
   const autoRotateEnabled = useMemoryStore(state => state.autoRotateEnabled);
   const toggleAutoRotate = useMemoryStore(state => state.toggleAutoRotate);
+  const dbMemories = useMemoryStore(state => state.dbMemories);
 
-  const totalMemories = memories.length;
+  const totalMemories = dbMemories.length;
   const discoveredCount = useMemo(() => {
-    // Only count regular memories, not the final one
     return discoveredMemories.filter(id => id !== 'final_star').length;
   }, [discoveredMemories]);
 
@@ -26,26 +31,56 @@ export default function OverlayUI() {
   return (
     <div className="absolute inset-0 pointer-events-none z-40 flex flex-col justify-between p-8">
 
-      {/* Top Left: Title */}
-      <AnimatePresence>
-        {!isHidden && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 1 }}
-            className=''
+      {/* Top Section */}
+      <div className="flex justify-between items-start w-full">
+        {/* Top Left: Title */}
+        <AnimatePresence>
+          {!isHidden && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 1 }}
+              className=''
+            >
+              <h1 className="text-white/80 font-serif text-2xl tracking-widest drop-shadow-md">
+                Constellations in our stars
+              </h1>
+              <p className="text-white/40 text-sm mt-1 tracking-wide">
+                Every star holds a memory.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          >
-            <h1 className="text-white/80 font-serif text-2xl tracking-widest drop-shadow-md">
-              Constellations in our stars
-            </h1>
-            <p className="text-white/40 text-sm mt-1 tracking-wide">
-              Every star holds a memory.
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Top Right: Buttons */}
+        <AnimatePresence>
+          {!isHidden && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="flex gap-4 pointer-events-auto"
+            >
+              <button 
+                className="text-white/80 hover:text-white transition-colors p-2 bg-white/5 hover:bg-white/10 rounded-full backdrop-blur-md cursor-pointer"
+                aria-label="Create Memory"
+                onClick={() => setIsCreateModalOpen(true)}
+              >
+                <Plus size={24} />
+              </button>
+              <button 
+                className="text-white/80 hover:text-white transition-colors p-2 bg-white/5 hover:bg-white/10 rounded-full backdrop-blur-md cursor-pointer"
+                aria-label="Menu"
+                onClick={() => setIsSidebarOpen(true)}
+              >
+                <Menu size={24} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Bottom Section */}
       <div className="flex justify-between items-end w-full mt-auto">
@@ -130,6 +165,8 @@ export default function OverlayUI() {
         </AnimatePresence>
       </div>
 
+      <CreateMemoryModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+      <MemorySidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
     </div>
   );
 }

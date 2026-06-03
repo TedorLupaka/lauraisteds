@@ -9,9 +9,11 @@ import Constellation from './Constellation';
 import CameraRig from './CameraRig';
 import FinalSequence from './FinalSequence';
 import TrexConstellation from './TrexConstellation';
-import { memories } from '../data/memories';
+import { useMemoryStore } from '../hooks/useMemoryStore';
 
 export default function Scene() {
+  const dbMemories = useMemoryStore(state => state.dbMemories);
+
   return (
     <div className="absolute inset-0 w-full h-full z-0">
       <Canvas
@@ -24,7 +26,7 @@ export default function Scene() {
           <Universe />
 
           <group>
-            {memories.map(memory => (
+            {dbMemories.map(memory => (
               <MemoryStar key={memory.id} memory={memory} />
             ))}
           </group>

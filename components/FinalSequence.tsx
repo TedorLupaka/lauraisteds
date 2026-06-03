@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useMemoryStore } from '../hooks/useMemoryStore';
-import { memories, finalMemory } from '../data/memories';
+
 import MemoryStar from './MemoryStar';
 import { Html } from '@react-three/drei';
 import { motion } from 'framer-motion';
@@ -11,17 +11,17 @@ export default function FinalSequence() {
   const discoveredMemories = useMemoryStore(state => state.discoveredMemories);
   const hasSeenFinalSequence = useMemoryStore(state => state.hasSeenFinalSequence);
   const setHasSeenFinalSequence = useMemoryStore(state => state.setHasSeenFinalSequence);
+  const dbMemories = useMemoryStore(state => state.dbMemories);
 
   const isUnlocked = useMemo(() => {
-    // Check if all regular memories are discovered
-    return memories.every(m => discoveredMemories.includes(m.id));
-  }, [discoveredMemories]);
+    if (dbMemories.length === 0) return false;
+    return dbMemories.every(m => discoveredMemories.includes(m.id));
+  }, [discoveredMemories, dbMemories]);
 
   if (!isUnlocked) return null;
 
   return (
     <>
-      <MemoryStar memory={finalMemory} />
       
       {!hasSeenFinalSequence && (
         <Html position={[0, 4, -8]} center>

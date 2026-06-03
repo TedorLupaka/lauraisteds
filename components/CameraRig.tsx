@@ -7,7 +7,7 @@ import gsap from 'gsap';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useMemoryStore } from '../hooks/useMemoryStore';
-import { memories, finalMemory } from '../data/memories';
+
 
 export default function CameraRig() {
   const { camera, gl } = useThree();
@@ -15,6 +15,7 @@ export default function CameraRig() {
   const activeMemoryId = useMemoryStore(state => state.activeMemoryId);
   const zoomSpeedMultiplier = useMemoryStore(state => state.zoomSpeedMultiplier);
   const autoRotateEnabled = useMemoryStore(state => state.autoRotateEnabled);
+  const dbMemories = useMemoryStore(state => state.dbMemories);
   const controlsRef = useRef<OrbitControlsImpl>(null);
 
   const zoomVelocityRef = useRef(new THREE.Vector3());
@@ -54,7 +55,7 @@ export default function CameraRig() {
     if (focusTarget) {
       targetPosition = new THREE.Vector3(...focusTarget);
     } else if (activeMemoryId) {
-      const targetMemory = [...memories, finalMemory].find(m => m.id === activeMemoryId);
+      const targetMemory = dbMemories.find(m => m.id === activeMemoryId);
       if (targetMemory) {
         targetPosition = new THREE.Vector3(...targetMemory.position);
       }
@@ -89,7 +90,7 @@ export default function CameraRig() {
         ease: "power3.inOut"
       });
     }
-  }, [activeMemoryId, focusTarget, camera]);
+  }, [activeMemoryId, focusTarget, camera, dbMemories]);
 
   // Custom Zoom-to-Cursor & Infinite Movement logic
   useEffect(() => {
@@ -191,7 +192,7 @@ export default function CameraRig() {
       rotateSpeed={0.6}
       maxPolarAngle={Math.PI}
       autoRotate={autoRotateEnabled}
-      autoRotateSpeed={0.3}
+      autoRotateSpeed={0.04}
     />
   );
 }

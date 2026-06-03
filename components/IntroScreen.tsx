@@ -11,11 +11,8 @@ const SEQUENCE = [
   { text: "Hey babe", charDelay: 150, eraseDelay: 55, holdAfter: 3000 },
   { text: "It's... me", charDelay: 105, eraseDelay: 55, holdAfter: 2000 },
   { text: "Ted.", charDelay: 140, eraseDelay: 80, holdAfter: 2500 },
-  { text: "I built a universe", charDelay: 150, eraseDelay: 100, holdAfter: 2000 }, // last — no erase
-  { text: "for us", charDelay: 150, eraseDelay: 100, holdAfter: 2000 },
-  { text: "where every star holds a memory", charDelay: 150, eraseDelay: 100, holdAfter: 2000 },
-
-  { text: "I hope you enjoy exploring", charDelay: 150, eraseDelay: 100, holdAfter: 2000 },
+  { text: "Welcome to our universe", charDelay: 150, eraseDelay: 50, holdAfter: 2000 }, // last — no erase
+  { text: "where every star holds a memory", charDelay: 150, eraseDelay: 20, holdAfter: 2000 },
 ];
 
 // Extra pause after punctuation characters while typing
@@ -38,6 +35,13 @@ export default function IntroScreen() {
   const startTyping = () => {
     if (phase !== 'tap') return;
     setPhase('typing');
+  };
+
+  const handleSkip = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    cancelRef.current = true;
+    setPhase('done');
+    setVisible(false);
   };
 
   useEffect(() => {
@@ -208,6 +212,29 @@ export default function IntroScreen() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* ── SKIP BUTTON ── */}
+          <button
+            onClick={handleSkip}
+            style={{
+              position: 'absolute',
+              bottom: '40px',
+              fontFamily: FONT,
+              fontSize: '0.8rem',
+              letterSpacing: '0.3em',
+              color: 'rgba(255,255,255,0.4)',
+              textTransform: 'uppercase',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              zIndex: 10,
+              transition: 'color 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.8)'}
+            onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.4)'}
+          >
+            Skip Intro
+          </button>
 
           <style>{`
             @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');

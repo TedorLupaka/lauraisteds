@@ -18,6 +18,7 @@ export default function MemoryStar({ memory }: MemoryStarProps) {
   const haloRef = useRef<THREE.Mesh>(null);
   const lightRef = useRef<THREE.PointLight>(null);
   
+  const sparkRef = useRef(memory.isNew ? 15 : 0);
   const [hovered, setHovered] = useState(false);
   const isDiscovered = useMemoryStore(state => state.isMemoryDiscovered(memory.id));
   const setActiveMemory = useMemoryStore(state => state.setActiveMemory);
@@ -28,6 +29,12 @@ export default function MemoryStar({ memory }: MemoryStarProps) {
   const starColor = isDiscovered ? "#ffd700" : "#aaccff";
 
   useFrame((state) => {
+    if (sparkRef.current > 0.01) {
+      sparkRef.current *= 0.95; // smooth exponential decay
+    } else {
+      sparkRef.current = 0;
+    }
+
     if (groupRef.current) {
       const time = state.clock.elapsedTime;
       // Gentle floating — set Y directly, no lerp needed here as sin is already smooth
@@ -35,7 +42,7 @@ export default function MemoryStar({ memory }: MemoryStarProps) {
       
       // Smooth pulsing scale using reusable vector
       const pulse = Math.sin(time * 1.5 + memory.position[2]) * 0.04;
-      const target = hovered || isActive ? 1.25 : 1 + pulse;
+      const target = hovered || isActive ? 1.25 : 1 + pulse + (sparkRef.current * 0.15);
       _targetScale.set(target, target, target);
       groupRef.current.scale.lerp(_targetScale, 0.08); // slower lerp = smoother
     }
@@ -43,13 +50,13 @@ export default function MemoryStar({ memory }: MemoryStarProps) {
     if (haloRef.current) {
       const material = haloRef.current.material as THREE.MeshBasicMaterial;
       // Lerp opacity smoothly
-      const targetOpacity = hovered || isActive ? 0.55 : 0.25;
+      const targetOpacity = hovered || isActive ? 0.55 : 0.25 + (sparkRef.current * 0.05);
       material.opacity += (targetOpacity - material.opacity) * 0.06;
     }
 
     if (lightRef.current) {
       // Smooth intensity transition — no abrupt jump on hover
-      const targetIntensity = hovered || isActive ? 2.5 : 0.8;
+      const targetIntensity = hovered || isActive ? 2.5 : 0.8 + sparkRef.current;
       lightRef.current.intensity += (targetIntensity - lightRef.current.intensity) * 0.06;
     }
   });

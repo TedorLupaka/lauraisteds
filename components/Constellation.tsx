@@ -5,32 +5,31 @@ import { useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { useMemoryStore } from '../hooks/useMemoryStore';
-import { memories, constellations } from '../data/memories';
+import { constellations } from '../data/memories';
 
 export default function Constellation() {
   const isConstellationComplete = useMemoryStore(state => state.isConstellationComplete);
+  const dbMemories = useMemoryStore(state => state.dbMemories);
   
   // Create an array of lines to draw for completed constellations
   const linesToDraw = useMemo(() => {
     const lines: THREE.Vector3[][] = [];
     
     constellations.forEach(constellation => {
-      if (isConstellationComplete(constellation.id, memories)) {
+      if (isConstellationComplete(constellation.id, dbMemories)) {
         // Get all memories in this constellation
-        const constellationMemories = memories.filter(m => m.constellationId === constellation.id);
+        const constellationMemories = dbMemories.filter(m => m.constellationId === constellation.id);
         
         // Simple way: connect them in order
         if (constellationMemories.length > 1) {
           const points = constellationMemories.map(m => new THREE.Vector3(...m.position));
-          // Connect the last to the first to make a closed shape if desired, or just a path
-          // For now, just a path through them
           lines.push(points);
         }
       }
     });
     
     return lines;
-  }, [isConstellationComplete]);
+  }, [isConstellationComplete, dbMemories]);
 
   // Group to handle gentle animation of the lines
   const groupRef = useRef<THREE.Group>(null);

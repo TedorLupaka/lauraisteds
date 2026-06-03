@@ -9,6 +9,7 @@ export interface Memory {
   audio?: string;
   position: [number, number, number];
   constellationId?: string;
+  isNew?: boolean;
 }
 
 export interface Constellation {
@@ -23,6 +24,7 @@ interface MemoryState {
   hasSeenFinalSequence: boolean;
   zoomSpeedMultiplier: number;
   autoRotateEnabled: boolean;
+  dbMemories: Memory[];
   
   discoverMemory: (id: string) => void;
   setActiveMemory: (id: string | null) => void;
@@ -30,6 +32,10 @@ interface MemoryState {
   setHasSeenFinalSequence: (seen: boolean) => void;
   setZoomSpeedMultiplier: (speed: number) => void;
   toggleAutoRotate: () => void;
+  setDbMemories: (memories: Memory[]) => void;
+  addDbMemory: (memory: Memory) => void;
+  updateDbMemory: (id: string, updates: Partial<Memory>) => void;
+  removeDbMemory: (id: string) => void;
   isMemoryDiscovered: (id: string) => boolean;
   isConstellationComplete: (constellationId: string, allMemories: Memory[]) => boolean;
 }
@@ -39,8 +45,9 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
   activeMemoryId: null,
   focusTarget: null,
   hasSeenFinalSequence: false,
-  zoomSpeedMultiplier: 1.0,
+  zoomSpeedMultiplier: 0.1,
   autoRotateEnabled: true,
+  dbMemories: [],
 
   discoverMemory: (id) => set((state) => ({
     discoveredMemories: state.discoveredMemories.includes(id) 
@@ -57,6 +64,21 @@ export const useMemoryStore = create<MemoryState>((set, get) => ({
   setZoomSpeedMultiplier: (speed) => set({ zoomSpeedMultiplier: speed }),
 
   toggleAutoRotate: () => set((state) => ({ autoRotateEnabled: !state.autoRotateEnabled })),
+
+  setDbMemories: (memories) => set({ dbMemories: memories }),
+
+  addDbMemory: (memory) => set((state) => {
+    if (state.dbMemories.some(m => m.id === memory.id)) return state;
+    return { dbMemories: [...state.dbMemories, memory] };
+  }),
+
+  updateDbMemory: (id, updates) => set((state) => ({
+    dbMemories: state.dbMemories.map(m => m.id === id ? { ...m, ...updates } : m)
+  })),
+
+  removeDbMemory: (id) => set((state) => ({
+    dbMemories: state.dbMemories.filter(m => m.id !== id)
+  })),
 
   isMemoryDiscovered: (id) => get().discoveredMemories.includes(id),
 
