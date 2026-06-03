@@ -12,7 +12,7 @@ const SEQUENCE = [
   { text: "It's... me", charDelay: 105, eraseDelay: 55, holdAfter: 2000 },
   { text: "Ted.", charDelay: 140, eraseDelay: 80, holdAfter: 2500 },
   { text: "Welcome to our universe", charDelay: 150, eraseDelay: 50, holdAfter: 2000 }, // last — no erase
-  { text: "where every star holds a memory", charDelay: 150, eraseDelay: 20, holdAfter: 2000 },
+  { text: "where every star holds a memory.", charDelay: 150, eraseDelay: 20, holdAfter: 2000 },
 ];
 
 // Extra pause after punctuation characters while typing
